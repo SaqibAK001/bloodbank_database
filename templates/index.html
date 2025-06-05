@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blood Bank System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #b30000;
+        }
+        form {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #fff0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select {
+            padding: 5px;
+            width: 100%;
+            max-width: 300px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-top: 20px;
+            background-color: white;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #aaa;
+            text-align: center;
+        }
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div style="font-family: Arial, sans-serif; line-height: 2; padding: 20px; max-width: 900px; margin: auto; font-size: 20px;">
+  <h2 style="color: #c0392b; font-size: 34px;">🩸 Blood Donation: A Gift That Saves Lives</h2>
+  <p>Donating blood is a simple, safe, and life-saving act. Every drop counts—your donation can help treat patients undergoing surgery, cancer treatment, trauma care, and those with chronic illnesses like thalassemia and hemophilia. With just one donation, you can make a difference in the lives of up to three people.</p>
+
+  <h3 style="color: #c0392b; font-size: 28px;">🌟 Benefits of Donating Blood</h3>
+  <ul>
+    <li><strong>Saves Lives:</strong> One unit of blood can help save 3 lives.</li>
+    <li><strong>Health Check-Up:</strong> Donors get a mini health screening before donation, including checks for blood pressure, hemoglobin levels, and infectious diseases.</li>
+    <li><strong>Reduces Iron Overload:</strong> Regular donation helps maintain healthy iron levels, potentially lowering the risk of heart disease.</li>
+    <li><strong>Promotes New Blood Cell Production:</strong> Your body quickly replaces the lost blood, stimulating the production of new, fresh cells.</li>
+    <li><strong>Mental Satisfaction:</strong> Giving blood creates a sense of purpose and community contribution.</li>
+  </ul>
+
+  <h3 style="color: #c0392b; font-size: 28px;">👥 Who Can Donate?</h3>
+  <ul>
+    <li>Individuals aged between 18 and 65 years.</li>
+    <li>Minimum weight of 50 kg (110 lbs).</li>
+    <li>In good health and feeling well on the day of donation.</li>
+    <li>No recent infections or surgeries.</li>
+    <li>Not currently taking certain medications (like antibiotics or blood thinners).</li>
+  </ul>
+
+  <h3 style="color: #c0392b; font-size: 28px;">🔁 How Often Can You Donate?</h3>
+  <ul>
+    <li><strong>Whole Blood:</strong> Every 3 months (for males), every 4 months (for females).</li>
+    <li><strong>Platelets:</strong> Every 2 weeks, up to 24 times a year.</li>
+    <li><strong>Plasma:</strong> Every 2 weeks.</li>
+  </ul>
+  <p style="font-weight: bold; color: #27ae60; font-size: 22px;">Join the movement. Be a lifesaver. Donate blood and inspire others to do the same. 🦸‍♂️🦸‍♀️</p>
+</div>
+
+    <h1>Blood Bank System</h1>
+
+    <h2>Register Donor</h2>
+    <form method="POST" action="/add_donor">
+        <label>Name:</label>
+        <input type="text" name="name" required>
+
+        <label>Age:</label>
+        <input type="number" name="age" min="18" max="65" required>
+
+        <label>Gender:</label>
+        <select name="gender">
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+
+        <label>Blood Type:</label>
+        <select name="blood_type" required>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+        </select>
+
+        <label>Donation Date:</label>
+        <input type="date" name="donation_date" required>
+
+        <label>Units Donated:</label>
+        <input type="number" name="units_donated" min="1" required>
+
+        <button type="submit">Add Donor</button>
+    </form>
+
+    <h2>Donor List</h2>
+    <table>
+        <tr>
+            <th>ID</th><th>Name</th><th>Age</th><th>Gender</th>
+            <th>Blood Type</th><th>Donation Date</th><th>Units</th>
+        </tr>
+        {% for donor in donors %}
+        <tr>
+            <td>{{ donor.donor_id }}</td>
+            <td>{{ donor.name }}</td>
+            <td>{{ donor.age }}</td>
+            <td>{{ donor.gender }}</td>
+            <td>{{ donor.blood_type }}</td>
+            <td>{{ donor.donation_date }}</td>
+            <td>{{ donor.units_donated }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Check Blood Availability</h2>
+    <form method="POST" action="/check_blood">
+        <label>Blood Type:</label>
+        <select name="blood_type" required>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+        </select>
+
+        <label>Units Needed:</label>
+        <input type="number" name="units_requested" min="1" required>
+
+        <button type="submit">Check</button>
+    </form>
+
+    {% if check_result is not none %}
+        {% if check_result %}
+            <p class="success">✅ Blood Available! Fill form to book:</p>
+            <form method="POST" action="/book_blood">
+                <input type="hidden" name="blood_type" value="{{ checked_blood }}">
+                <input type="hidden" name="units_received" value="{{ requested_units }}">
+
+                <label>Name:</label>
+                <input type="text" name="name" required>
+
+                <label>Age:</label>
+                <input type="number" name="age" required>
+
+                <label>Gender:</label>
+                <select name="gender">
+                    <option>Male</option>
+                    <option>Female</option>
+                </select>
+
+                <label>Date of Receipt:</label>
+                <input type="date" name="received_date" required>
+
+                <button type="submit">Book Blood</button>
+            </form>
+        {% else %}
+            <p class="error">❌ Not enough units available.</p>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
