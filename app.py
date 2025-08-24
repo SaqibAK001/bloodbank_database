@@ -3,20 +3,31 @@ import mysql.connector
 
 app = Flask(__name__)
 
-conn = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    password='cse@123',
-    database='bloodbank'
-)
+def get_connection():
+    return mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='cse@123',
+        database='bloodbank'
+    )
 
 @app.route('/')
 def index():
+    conn = get_connection()
     cursor = conn.cursor(dictionary=True)
+
     cursor.execute("SELECT * FROM donors")
     donors = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM recipients")
+    recipients = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM blood_stock")
+    stock = cursor.fetchall()
+
     cursor.close()
-    return render_template('index.html', donors=donors)
+
+    return render_template('index.html', donors=donors, recipients=recipients, stock=stock)
 
 @app.route('/add_donor', methods=['POST'])
 def add_donor():
@@ -27,6 +38,7 @@ def add_donor():
     donation_date = request.form['donation_date']
     units_donated = request.form['units_donated']
 
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO donors (name, age, gender, blood_type, donation_date, units_donated)
@@ -41,23 +53,25 @@ def check_blood():
     blood_type = request.form['blood_type']
     units_requested = int(request.form['units_requested'])
 
+    conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT units_available FROM blood_stock WHERE blood_type = %s", (blood_type,))
     result = cursor.fetchone()
     cursor.close()
 
-    if result and result['units_available'] >= units_requested:
-        available = True
-    else:
-        available = False
+    available = result and result['units_available'] >= units_requested
 
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM donors")
     donors = cursor.fetchall()
+    cursor.execute("SELECT * FROM recipients")
+    recipients = cursor.fetchall()
+    cursor.execute("SELECT * FROM blood_stock")
+    stock = cursor.fetchall()
     cursor.close()
 
-    return render_template('index.html', donors=donors, check_result=available, checked_blood=blood_type, requested_units=units_requested)
-
+    return render_template('index.html', donors=donors, recipients=recipients, stock=stock,
+                           check_result=available, checked_blood=blood_type, requested_units=units_requested)
 
 @app.route('/book_blood', methods=['POST'])
 def book_blood():
@@ -68,6 +82,7 @@ def book_blood():
     received_date = request.form['received_date']
     units_received = request.form['units_received']
 
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO recipients (name, age, gender, blood_type, received_date, units_received)
@@ -78,4 +93,4 @@ def book_blood():
     return redirect('/')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="127.0.0.1", port=5000)

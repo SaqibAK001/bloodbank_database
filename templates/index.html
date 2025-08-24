@@ -78,9 +78,8 @@
     <li><strong>Platelets:</strong> Every 2 weeks, up to 24 times a year.</li>
     <li><strong>Plasma:</strong> Every 2 weeks.</li>
   </ul>
-  <p style="font-weight: bold; color: #27ae60; font-size: 22px;">Join the movement. Be a lifesaver. Donate blood and inspire others to do the same. 🦸‍♂️🦸‍♀️</p>
+  <p style="font-weight: bold; color: #27ae60; font-size: 22px;">Join the movement. Be a lifesaver. Donate blood and inspire others to do the same. 🦸‍♂🦸‍♀</p>
 </div>
-
     <h1>Blood Bank System</h1>
 
     <h2>Register Donor</h2>
@@ -113,6 +112,8 @@
         <button type="submit">Add Donor</button>
     </form>
 
+    <hr>
+
     <h2>Donor List</h2>
     <table>
         <tr>
@@ -131,6 +132,29 @@
         </tr>
         {% endfor %}
     </table>
+
+    <hr>
+
+    <h2>Recipient List</h2>
+    <table>
+        <tr>
+            <th>ID</th><th>Name</th><th>Age</th><th>Gender</th>
+            <th>Blood Type</th><th>Received Date</th><th>Units</th>
+        </tr>
+        {% for recipient in recipients %}
+        <tr>
+            <td>{{ recipient.recipient_id }}</td>
+            <td>{{ recipient.name }}</td>
+            <td>{{ recipient.age }}</td>
+            <td>{{ recipient.gender }}</td>
+            <td>{{ recipient.blood_type }}</td>
+            <td>{{ recipient.received_date }}</td>
+            <td>{{ recipient.units_received }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
 
     <h2>Check Blood Availability</h2>
     <form method="POST" action="/check_blood">
@@ -174,5 +198,26 @@
             <p class="error">❌ Not enough units available.</p>
         {% endif %}
     {% endif %}
+
+    <hr>
+
+    <h2>Blood Stock Availability</h2>
+    <table>
+        <tr>
+            <th>Blood Type</th>
+            <th>Total Donated</th>
+            <th>Total Received</th>
+            <th>Units Available</th>
+        </tr>
+        {% for row in stock %}
+        <tr>
+            <td>{{ row.blood_type }}</td>
+            <td>{{ row.total_donated or 0 }}</td>
+            <td>{{ row.total_received or 0 }}</td>
+            <td>{{ row.units_available or 0 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
 </body>
 </html>
