@@ -1,7 +1,14 @@
 from flask import Flask, render_template, request, redirect
 import mysql.connector
+import psycopg2
+import os
 
 app = Flask(__name__)
+
+DATABASE_URL = os.environ.get("postgresql://bloodbank_db_vvfz_user:iWcwElXQppdW50j2khuEEFliXNMhcv8p@dpg-d2liq4n5r7bs73dp5smg-a/bloodbank_db_vvfz")
+
+conn = psycopg2.connect(DATABASE_URL)
+cursor = conn.cursor()
 
 def get_connection():
     return mysql.connector.connect(
